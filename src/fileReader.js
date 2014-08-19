@@ -1,5 +1,6 @@
 'use strict';
 
+// Just a wrapper for the HTML5 FileReader, so we can use promises
 var fileReader = function ($q) {
 
   var onLoad = function(reader, deferred, scope) {
@@ -10,7 +11,7 @@ var fileReader = function ($q) {
     };
   };
 
-  var onError = function (reader, deferred, scope) {
+  var onError = function(reader, deferred, scope) {
     return function () {
       scope.$apply(function () {
         deferred.reject(reader.result);
@@ -18,6 +19,7 @@ var fileReader = function ($q) {
     };
   };
 
+  // Send file progress to the scope
   var onProgress = function(reader, scope) {
     return function (event) {
       scope.$broadcast('fileProgress', {
@@ -27,6 +29,7 @@ var fileReader = function ($q) {
     };
   };
 
+  // Actually wrap the reader
   var getReader = function(deferred, scope) {
     var reader = new FileReader();
     reader.onload = onLoad(reader, deferred, scope);
@@ -35,17 +38,18 @@ var fileReader = function ($q) {
     return reader;
   };
 
-  var readAsDataURL = function (file, scope) {
+  // Read the file, return a promise
+  var readAsText = function(file, scope) {
     var deferred = $q.defer();
-     
-    var reader = getReader(deferred, scope);         
-    reader.readAsDataURL(file);
-     
+
+    var reader = getReader(deferred, scope);
+    reader.readAsText(file);
+
     return deferred.promise;
   };
 
   return {
-    readAsDataUrl: readAsDataURL  
+    readAsText: readAsText
   };
 };
 

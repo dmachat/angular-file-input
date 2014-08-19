@@ -1,29 +1,25 @@
 'use strict';
 
-angular.module('fileInput').directive('fileInputButton', function() {
+angular.module('fileInput').directive('fileInputButton', ['$parse', 'fileReader', function($parse, fileReader) {
   return {
     restrict: 'EA',
-    scope: {
-      file: '=',
-    },
-    link: function(scope, element) {
+    link: function(scope, element, attrs) {
 
+      // Attach the input to the element
       var el = angular.element(element);
       var fileInput = angular.element('<input type="file" />');
       el.append(fileInput);
 
-      fileInput.on('change', function fileInputButtonChange() {
+      // Use $parse service to push file contents on load
+      var fileLoaded = $parse(attrs.onFileLoad);
 
-        if (fileInput[0].files && fileInput[0].files.length === 0) {
-          return;
-        }
-
-        scope.$apply(function() {
-          scope.file = fileInput[0].files;
-        });
-
+      // When a file is attached to the input, read it and send the contents to the fileInput directive
+      fileInput.on('change', function(e) {
+        fileReader.readAsText((e.srcElement || e.target).files[0], scope)
+          .then(function(result) {
+            fileLoaded(scope, { file: result });
+          });
       });
-
     }
   };
-});
+}]);

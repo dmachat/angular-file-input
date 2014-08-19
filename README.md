@@ -1,7 +1,6 @@
 # Angular File Input
 Input text data using a bootstrap style button for file input.
 
- - Works in all browsers
  - Lightweight
  - No dependency on jQuery
 
@@ -43,8 +42,16 @@ The directive masks the normal file input and makes it look like a button
 <div
   class="btn btn-primary btn-file-input"
   file-input-button
+  on-file-load="getFileText(file)"
 
 >Fileinput</div>
+```
+
+Add the onFileLoad function to your scope to get the file text
+```js
+$scope.getFileText = function(file) {
+  $scope.loadedFileText = file;
+}
 ```
 
 ## Build it yourself!
