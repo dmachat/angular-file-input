@@ -18,6 +18,7 @@ angular.module('fileInput').directive('fileInputButton', [
         fileInput.on('change', function (e) {
           fileReader.readAsText((e.srcElement || e.target).files[0], scope).then(function (result) {
             fileLoaded(scope, { file: result });
+            fileInput.val(null);
           });
         });
       }
