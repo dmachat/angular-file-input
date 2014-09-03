@@ -57,6 +57,11 @@ $scope.getFileText = function(file) {
 ## Build it yourself!
 angular-file-input is built with grunt.
 
+To run a simple connect server to see the directive in action or to develop
+```sh
+grunt dev
+```
+
 To run the tests
 ```sh
 grunt test
@@ -70,5 +75,5 @@ grunt autotest
 
 And when you're done minify it
 ```sh
-grunt package
+grunt build
 ```

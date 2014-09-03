@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>File Input Example</title>
+  <meta name="description" content="" />
+  <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.css" />
+  <link rel="stylesheet" href="angular-file-input.css" />
+  <!--[if lt IE 9]>
+    <script src="es5-shim/es5-shim.min.js"></script>
+    <script src="json3/lib/json3.min.js"></script>
+    <script src="html5shiv/dist/html5shiv.js"></script>
+    <script src="respond/respond.min.js"></script>
+  <![endif]-->
+  <script src="angular/angular.js" charset="utf-8"></script>
+  <script src="angular-file-input.js" charset="utf-8"></script>
+
+  <script charset="utf-8">
+
+    // Define our main app
+    var app = angular.module('app', [
+      'fileInput'
+    ]);
+
+    // Scope as the parent of the angular-file-input directive
+    app.controller('SimpleCtrl', function($scope) {
+      $scope.getFileText = function(file) {
+        $scope.fileText = file;
+      };
+    });
+
+    // Start it up
+    angular.element(document).ready(function () {
+      angular.bootstrap(document, ['app']);
+    });
+
+  </script>
+</head>
+<body>
+  <div class="container" ng-controller="SimpleCtrl">
+    <div class="jumbotron">
+      <div class="jumbotron-body">
+        <h1>Angular File Input</h1>
+        <p>Input text data using a bootstrap style button for file input</p>
+        <ul>
+          <li>Lightweight</li>
+          <li>No dependency on jQuery</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Simple Example</h3>
+      </div>
+      <div class="panel-body">
+        <file-input-button
+          class="btn btn-primary btn-file-input"
+          on-file-load="getFileText(file)"
+        >Fileupload</upload-button>
+      </div>
+    </div>
+
+    <h4 class="m-lg">File Text</h4>
+    <div class="well">{{ fileText }}</div>
+
+  </div>
+</body>
+</html>

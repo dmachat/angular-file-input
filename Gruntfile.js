@@ -1,7 +1,5 @@
 'use strict';
 
-var path = require('path');
-
 module.exports = function (grunt) {
 
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
@@ -10,10 +8,12 @@ module.exports = function (grunt) {
 
     config: {
       src: 'src/**/*.js',
+      dist: 'dist',
+      dev: 'dev',
       unit: 'test/**/*.js',
       e2e: 'e2e/**/*.js',
-      less: 'src/**/*.less',
-      dist: 'angular-file-input.js',
+      sass: 'src/**/*.scss',
+      module: 'angular-file-input.js',
       minified: 'angular-file-input.min.js'
     },
 
@@ -70,41 +70,51 @@ module.exports = function (grunt) {
         files: ['<%= config.src %>', '<%= config.unit %>'],
         tasks: ['concat', 'karma:unit:run', 'jshint']
       },
-      less: {
-        files: ['<%= config.less %>'],
-        tasks: ['less:dev']
+      sass: {
+        files: ['<%= config.sass %>'],
+        tasks: ['sass:dev']
       },
       livereload: {
         options: {
           livereload: true
         },
-        files: ['<%= config.dist %>', 'src/**/*.css']
+        files: ['<%= config.dist %>/<%= config.module %>', 'src/**/*.css']
       }
     },
 
-    express: {
-      server: {
+    // The actual grunt server settings
+    connect: {
+      options: {
+        port: 9000,
+        livereload: 35729,
+        // Change this to '0.0.0.0' to access the server from outside
+        hostname: 'localhost'
+      },
+      livereload: {
         options: {
-          hostname: '*',
-          debug: true,
-          livereload: true,
-          port: 9001,
-          server: path.resolve('./example/server')
+          open: true,
+          base: [
+            '.tmp',
+            'bower_components',
+            '<%= config.dist %>',
+            '<%= config.dev %>',
+          ]
         }
-      }
+      },
     },
 
     // Building
     clean: {
       dist: {
         files: '<%= config.dist %>'
-      }
+      },
+      dev: '.tmp'
     },
 
     concat: {
       dev: {
         files: {
-          '<%= config.dist %>': '<%= config.src %>'
+          '<%= config.dist %>/<%= config.module %>': '<%= config.src %>'
         }
       }
     },
@@ -112,7 +122,7 @@ module.exports = function (grunt) {
     ngmin: {
       dist: {
         files: {
-          '<%= config.dist %>': '<%= config.dist %>'
+          '<%= config.dist %>/<%= config.module %>': '<%= config.dist %>/<%= config.module %>'
         }
       }
     },
@@ -120,7 +130,7 @@ module.exports = function (grunt) {
     uglify: {
       dist: {
         files: {
-          '<%= config.minified %>': '<%= config.dist %>'
+          '<%= config.dist %>/<%= config.minified %>': '<%= config.dist %>/<%= config.module %>'
         },
         options: {
           compress: true
@@ -128,23 +138,28 @@ module.exports = function (grunt) {
       }
     },
 
-    less: {
+    sass: {
       dev: {
-        files: [{
-          expand: true,
-          ext: '.min.css',
-          src: ['<%= config.less %>']
-        }]
+        options: {
+          style: 'expanded'
+        },
+        files: {
+          '<%= config.dist %>/angular-file-input.css': 'src/directives/btnFileInput.scss'
+        }
       },
       dist: {
         options: {
-          yuicompress: true
+          style: 'compressed'
         },
-        files: [{
-          expand: true,
-          ext: '.min.css',
-          src: ['<%= config.less %>']
-        }]
+        files: {
+          '<%= config.dist %>/angular-file-input.min.css': 'src/directives/btnFileInput.scss'
+        }
+      }
+    },
+
+    wiredep: {
+      target: {
+        src: ['<%= config.dev %>/*.html'],
       }
     },
 
@@ -162,10 +177,10 @@ module.exports = function (grunt) {
           'CHANGELOG.md',
           'package.json',
           'bower.json',
-          'src/directives/btnFileInput.less',
-          'src/directives/btnFileInput.min.css',
-          'angular-file-input.js',
-          'angular-file-input.min.js'
+          'dist/angular-file-input.scss',
+          'dist/angular-file-input.min.css',
+          'dist/angular-file-input.js',
+          'dist/angular-file-input.min.js'
         ],
         createTag: true,
         tagName: '%VERSION%',
@@ -182,12 +197,13 @@ module.exports = function (grunt) {
     'karma:continuous'
   ]);
 
-  grunt.registerTask('webserver', [
-    'concat',
-    'less:dev',
+  grunt.registerTask('dev', [
+    'clean:dev',
+    'concat:dev',
+    'sass:dev',
     'jshint',
-    'express',
-    'watch',
+    'connect:livereload',
+    'watch'
   ]);
 
   grunt.registerTask('autotest', [
@@ -197,16 +213,16 @@ module.exports = function (grunt) {
     'watch'
   ]);
 
-  grunt.registerTask('package', [
+  grunt.registerTask('build', [
     'clean:dist',
     'concat',
     'ngmin:dist',
     'uglify:dist',
-    'less:dist'
+    'sass'
   ]);
 
   grunt.registerTask('default', [
-    'package',
+    'build',
     'test'
   ]);
 
@@ -216,7 +232,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('release', [
-    'package',
+    'build',
     'bump'
   ]);
 
