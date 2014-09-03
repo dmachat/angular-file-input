@@ -1,9 +1,7 @@
 exports.config = {
 
-  name: 'angular-upload',
+  name: 'angular-file-input',
   seleniumAddress: 'http://localhost:4444/wd/hub',
-  //sauceUser: "leon",
-  //sauceKey: "1234",
   specs: ['e2e/**/*.js'],
 
   capabilities: {
